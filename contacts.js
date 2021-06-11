@@ -2,50 +2,63 @@
 const fs = require('fs').promises;
 const path = require ('path');
 
-const contactsPath = path.join('./db.contacts.json');
+const contactsPath = path.join(__dirname, './db/contacts.json');
 
-// TODO: задокументировать каждую функцию
 function listContacts () {
-    fs.readFile(contactsPath)
-    .then(data => console.log(data))
-    .catch(err => console.error) 
-  }
-  
-  function getContactById(contactId) {
-    fs.readFile(contactsPath)
+    return fs.readFile(contactsPath, 'utf-8')
     .then(data => {
         const contacts = JSON.parse(data);
-        console.log(contacts.find(id)===contactId);
+        console.table(contacts);
     })
     .catch(err => console.error) 
   }
   
-  function removeContact(contactId) {
-    fs.readFile(contactsPath)
-    .then(data => {
+function getContactById(contactId) {
+    return fs.readFile(contactsPath, 'utf-8')
+    .then(data=> {
         const contacts = JSON.parse(data);
-        console.log(contacts.filter(id)!==contactId);
+        console.log(contacts.find(contact => contact.id === contactId));
     })
     .catch(err => console.error) 
   }
   
-  function addContact(name, email, phone) {
+function removeContact(contactId) {
+    fs.readFile(contactsPath, 'utf-8')
+    .then(data => {
+        const contacts = JSON.parse(data);
+        if(!contacts.find(contact => contact.id === contactId)){
+           console.log('Sorry we cannot find this contact');
+           return;
+        }
+        const filteredContacts = contacts.filter(({id}) => id !==contactId);
+        fs.writeFile(contactsPath, JSON.stringify(filteredContacts), 'utf-8');
+        console.log('The contact was successfully deleted')
+        listContacts();
+    })
+    .catch(err => console.error) 
+  }
+  
+function addContact(name, email, phone) {
       const id = Date.now();
-      const contact ={
+      const newContact ={
           id,
           name,
           email,
           phone,
       }
-        fs.readFile(contactsPath)
+    return fs.readFile(contactsPath, 'utf-8')
         .then(data => {
-            fs.write(...data, contact);
+            const contacts = JSON.parse(data);
+            const newContacts =[...contacts, newContact];
+            fs.writeFile(contactsPath, JSON.stringify(newContacts), 'utf-8')
+            listContacts();
+            console.log('Added');
         })
         .catch(err => console.error) 
   }
 
 
-module.export={
+module.exports={
     listContacts,
     getContactById,
     removeContact,

@@ -6,7 +6,6 @@ const {listContacts, getContactById, removeContact, addContact} = require ('./co
 function invokeAction({ action, id, name, email, phone }) {
   switch (action) {
     case 'list':
-      // ...
       listContacts();
       break;
 
